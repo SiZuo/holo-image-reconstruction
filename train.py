@@ -1,7 +1,5 @@
 import tensorflow as tf
-from FusionNet_newImage import FusionNet
-#from FusionNet_add_1 import FusionNet_add_1
-#from FusionNet_del_1 import FusionNet_del_1
+from FusionNet import FusionNet
 import numpy as np
 from ops import losses
 from ops import utils
@@ -61,13 +59,6 @@ def train_with_cpu(flag):
         target_0_255 = tf.concat([target_intensity, 255*target_phase_0_1], 3)
         target_0_1 = model.Normalize_0_1(target_0_255)
     
-        '''
-        #target_original = tf.concat([target_intensity, target_phase], 3)
-        #target_0_225 = tf.concat([target_intensity, target_phase], 3)
-        #target_0_1 = tf.concat([target_intensity_0_1, target_phase_0_1], 3)
-        #print("target_0_225", target_0_225.get_shape())
-       
-        '''
         with tf.name_scope('summaries'):
           with tf.name_scope('Model'):
             with tf.device('/gpu:1'):
@@ -115,14 +106,7 @@ def train_with_cpu(flag):
           for train in flag.train_phase:
            print ("------------------------------------")
            print ("train phase is now: %d"%train)
-           '''
-           if (train == 2):
-               model = FusionNet_del_1()
-               print ('Training model: FusionNet_del_1_layer with noise level 15')
-           if (train == 0):
-               model = FusionNet_add_1()
-               print ('Training model: FusionNet_add_1_layer with noise level 15')
-            '''
+         
            if (train == 1):
                model = FusionNet()
                print ('Training model: FusionNet with noise level %d with BN at the begining'%flag.noise_total)
@@ -135,21 +119,7 @@ def train_with_cpu(flag):
             #if learning_rate == 0.003:
              #   summary_writer = tf.summary.FileWriter('./train_noise_5_gradient_logs_2_003', graph_def=sess.graph_def)
              #   ckpt_dir = "./checkpoint_with_noise_5_gradient_2_003"
-            #if learning_rate == 0.004:
-             #   summary_writer = tf.summary.FileWriter('./train_noise_5_gradient_logs_2_004', graph_def=sess.graph_def)
-              #  ckpt_dir = "./checkpoint_with_noise_5_gradient_2_004"
-            #if learning_rate == 0.0009:
-             #   summary_writer = tf.summary.FileWriter('./train_noise_5_gradient_logs_2_0009', graph_def=sess.graph_def)
-              #  ckpt_dir = "./checkpoint_with_noise_5_gradient_2_0009"
-            #if learning_rate == 0.0007:
-             #   summary_writer = tf.summary.FileWriter('./train_noise_5_gradient_logs_2_0007', graph_def=sess.graph_def)
-              #  ckpt_dir = "./checkpoint_with_noise_5_gradient_2_0007"
-          #  if  train == 0:
-           #     log = './train_noise_15_log_FusionNet_add_1_layer'
-                #os.mkdir(log)
-            #    summary_writer = tf.summary.FileWriter(log, graph_def=sess.graph_def)
-              #  projector.visualize_embeddings(summary_writer, projector.ProjectorConfig())
-             #   ckpt_dir = "./checkpoint_with_noise_15_FusionNet_add_1_layer"
+
             '''
 #save log file in certain path
             if  train == 1:
@@ -161,45 +131,7 @@ def train_with_cpu(flag):
                     
                 summary_writer = tf.summary.FileWriter(log_1, graph_def=sess.graph_def)
                 projector.visualize_embeddings(summary_writer, projector.ProjectorConfig())
-                ckpt_dir = "./checkpoint_without_noise_FusionNet_batch1_BNatBegin_new_newImage"
-            '''
-            if  train == 2:
-                log_2 = './train_noise_15_log_FusionNet_del_1_layer_batch1_newImage'
-                #os.mkdir(log_2)
-                summary_writer = tf.summary.FileWriter(log_2, graph_def=sess.graph_def)
-                projector.visualize_embeddings(summary_writer, projector.ProjectorConfig())
-                ckpt_dir = "./checkpoint_with_noise_15_FusionNet_del_1_layer_batch10"
-                
-            #if  flag.coef == 3:
-             #   summary_writer = tf.summary.FileWriter('./train_noise_15_logs_gradient_3_7epo', graph_def=sess.graph_def)
-              #  projector.visualize_embeddings(summary_writer, projector.ProjectorConfig())
-               # ckpt_dir = "./checkpoint_with_noise_15_gradient_3_7epo"
-            
-            #if  flag.coef == 0.5:
-             #   summary_writer = tf.summary.FileWriter('./train_noise_15_logs_gradient_0_5_7epo', graph_def=sess.graph_def)
-              #  projector.visualize_embeddings(summary_writer, projector.ProjectorConfig())
-               # ckpt_dir = "./checkpoint_with_noise_15_gradient_0_5_7epo"
-                
-            #if  flag.coef == 2.5:
-             #   summary_writer = tf.summary.FileWriter('./train_noise_15_logs_gradient_2_5', graph_def=sess.graph_def)
-              #  projector.visualize_embeddings(summary_writer, projector.ProjectorConfig())
-               # ckpt_dir = "./checkpoint_with_noise_15_gradient_2_5"
-            
-           # if  flag.coef == 8:
-            #    summary_writer = tf.summary.FileWriter('./train_noise_15_logs_gradient_8', graph_def=sess.graph_def)
-             #   projector.visualize_embeddings(summary_writer, projector.ProjectorConfig())
-              #  ckpt_dir = "./checkpoint_with_noise_15_gradient_8"
-                
-            #if  train == 0:
-             #   summary_writer = tf.summary.FileWriter('./train_noise_15_logs_gradient_0_5', graph_def=sess.graph_def)
-              #  projector.visualize_embeddings(summary_writer, projector.ProjectorConfig())
-               # ckpt_dir = "./checkpoint_with_noise_15_gradient_0_5"
-                
-            #if  train == 1:
-             #   summary_writer = tf.summary.FileWriter('./train_noise_15_logs_gradient_0_5_3epo', graph_def=sess.graph_def)
-              #  projector.visualize_embeddings(summary_writer, projector.ProjectorConfig())
-               # ckpt_dir = "./checkpoint_with_noise_15_gradient_0_5_3epo"
-            '''
+                ckpt_dir = "./checkpoint_without_noise_FusionNet_batch1_newImage"
             print("Learning start!!")
             
             start = time.time()
@@ -240,11 +172,7 @@ def train_with_cpu(flag):
                     
                     batch_in_files = [holo[idx] for idx in index_input]
                     batch_in_image = [(cv2.imread(batch_in_file)+ noises) for batch_in_file in batch_in_files]
-                    
-#fix the pixel value in the range(0, 255)
-                    #batch_in_image[batch_in_image < 0] = 0
-                    #batch_in_image[batch_in_image > 255] = 255
-                    #batch_in_image[batch_in_image < 0] = 0
+                  
                     if flag.channel_dim == 1:
                         batch_in_images = np.array(batch_in_image).astype(np.float32)[:, :, :, :1]
                     else:
@@ -293,45 +221,7 @@ def train_with_cpu(flag):
                         #utils.save_ckpt(flag.ckpt_dir, ckpt_cnt, sess, flag.ckpt_name)
                         utils.save_ckpt(ckpt_dir, ckpt_cnt, sess, flag.ckpt_name)
                         j = 0
-                        '''
-                        if learning_rate == 0.003:
-                            for idx in range(len(sample)): 
-                               cv2.imwrite('./train_noise_5_gradient_result_2_003/gen_intensity_with_noise_%s.bmp'%(sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
-                               cv2.imwrite('./train_noise_5_gradient_result_2_003/gen_phase_with_noise_%s.bmp'%(sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
-                               j += 1
-                            
-                        if learning_rate == 0.004:
-                            for idx in range(len(sample)): 
-                               cv2.imwrite('./train_noise_5_gradient_result_2_004/gen_intensity_with_noise_%s.bmp'%(sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
-                               cv2.imwrite('./train_noise_5_gradient_result_2_004/gen_phase_with_noise_%s.bmp'%(sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
-                               j += 1
-                               
-                        if learning_rate == 0.0009:
-                            for idx in range(len(sample)): 
-                               cv2.imwrite('./train_noise_5_gradient_result_2_0009/gen_intensity_with_noise_%s.bmp'%(sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
-                               cv2.imwrite('./train_noise_5_gradient_result_2_0009/gen_phase_with_noise_%s.bmp'%(sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
-                               j += 1
-                               
-                        if learning_rate == 0.0007:
-                            for idx in range(len(sample)): 
-                               cv2.imwrite('./train_noise_5_gradient_result_2_0007/gen_intensity_with_noise_%s.bmp'%(sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
-                               cv2.imwrite('./train_noise_5_gradient_result_2_0007/gen_phase_with_noise_%s.bmp'%(sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
-                               j += 1
-                            
-                        if flag.coef == 3:
-                            for idx in range(len(sample)): 
-                               cv2.imwrite('./train_noise_15_gradient_result_3_7epo/gen_intensity_with_noise_%d_%s.bmp'%(noise_level, sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
-                               cv2.imwrite('./train_noise_15_gradient_result_3_7epo/gen_phase_with_noise_%d_%s.bmp'%(noise_level, sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
-                               j += 1
-                               
-                        if train == 0:
-                            dir_0 = './train_noise_15_result_add_1_layer'
-                            #os.mkdir(dir_0)
-                            for idx in range(len(sample)): 
-                               cv2.imwrite(dir_0 +'/gen_intensity_with_noise_%d_%s.bmp'%(noise_level, sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
-                               cv2.imwrite(dir_0 +'/gen_phase_with_noise_%d_%s.bmp'%(noise_level, sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
-                               j += 1
-                        '''
+                       
                                
                         if train == 1:
                             dir_1 = './train_noise_0_result_batch1_BNatBegin_newImage'
@@ -343,33 +233,7 @@ def train_with_cpu(flag):
                                cv2.imwrite(dir_1+'/coef%d_gen_intensity_with_noise_%d_%s.bmp'%(flag.coef, noise_level, sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
                                cv2.imwrite(dir_1+'/coef%d_gen_phase_with_noise_%d_%s.bmp'%(flag.coef, noise_level, sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
                                j += 1
-                        '''       
-                        if train == 2:
-                            dir_2 = './train_noise_15_result_del_1_layer_batch1_newImage'
-                            for idx in range(len(sample)): 
-                               cv2.imwrite(dir_2 +'/gen_intensity_with_noise_%d_%s.bmp'%(noise_level, sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
-                               cv2.imwrite(dir_2 +'/gen_phase_with_noise_%d_%s.bmp'%(noise_level, sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
-                               j += 1
-
-                        if flag.coef == 8:
-                            for idx in range(len(sample)): 
-                               cv2.imwrite('./train_noise_15_gradient_result_8/gen_intensity_with_noise_%d_%s.bmp'%(noise_level, sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
-                               cv2.imwrite('./train_noise_15_gradient_result_8/gen_phase_with_noise_%d_%s.bmp'%(noise_level, sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
-                               j += 1
-                               
-                        if train == 0:
-                            for idx in range(len(sample)): 
-                               cv2.imwrite('./train_noise_15_gradient_result_0_5/gen_intensity_with_noise_%d_%s.bmp'%(noise_level, sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
-                               cv2.imwrite('./train_noise_15_gradient_result_0_5/gen_phase_with_noise_%d_%s.bmp'%(noise_level, sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
-                               j += 1
-                               
-                        if train == 1:
-                            for idx in range(len(sample)): 
-                               cv2.imwrite('./train_noise_15_gradient_result_0_5_3epo/gen_intensity_with_noise_%d_%s.bmp'%(noise_level, sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
-                               cv2.imwrite('./train_noise_15_gradient_result_0_5_3epo/gen_phase_with_noise_%d_%s.bmp'%(noise_level, sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
-                               j += 1
-                         '''
-                               
+                     
                 epoch += 1
             
                 
