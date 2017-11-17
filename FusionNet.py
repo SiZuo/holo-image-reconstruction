@@ -2,8 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 
 import tensorflow as tf
-#from ops import layers_bn_after
-#from ops import layers_bn_begin
 from ops import layers
 from ops import acts
 import numpy as np
@@ -46,9 +44,6 @@ class FusionNet(object):
          #   ind += 1
         
         for i in sample:
-            #index_in.append(input_.index("test_holo"+ str(sample[i])+".bmp")) 
-            #index_out_intensity.append(out_intensity.index("test_ori"+ str(sample[i])+".bmp"))
-            #index_out_phase.append(out_phase.index("test_ori"+ str(sample[i])+ "_phase.bmp"))
             obj_name = input_[i] #2017-07-14_14_07_24_084.bmp
             
             index_in.append(int(i)) 
@@ -92,37 +87,22 @@ class FusionNet(object):
         
         
     def total_variation(self, images, name=None):
-    #https://github.com/tensorflow/tensorflow/blob/r1.2/tensorflow/python/ops/image_ops_impl.py
          with tf.name_scope('total_variation'):
             ndims = images.get_shape().ndims
 
             if ndims == 3:
-      # The input is a single image with shape [height, width, channels].
-
-      # Calculate the difference of neighboring pixel-values.
-      # The images are shifted one pixel along the height and width by slicing.
                pixel_dif1 = images[1:, :, :] - images[:-1, :, :]
                pixel_dif2 = images[:, 1:, :] - images[:, :-1, :]
 
-      # Sum for all axis. (None is an alias for all axis.)
                sum_axis = None
             elif ndims == 4:
-      # The input is a batch of images with shape:
-      # [batch, height, width, channels].
-
-      # Calculate the difference of neighboring pixel-values.
-      # The images are shifted one pixel along the height and width by slicing.
                pixel_dif1 = images[:, 1:, :, :] - images[:, :-1, :, :]
                pixel_dif2 = images[:, :, 1:, :] - images[:, :, :-1, :]
 
-      # Only sum for the last 3 axis.
-      # This results in a 1-D tensor with the total variation for each image.
                sum_axis = [1, 2, 3]
             else:
                raise ValueError('\'images\' must be either 3 or 4-dimensional.')
 
-    # Calculate the total variation by taking the absolute value of the
-    # pixel-differences and summing over the appropriate axis.
             tot_var = (math_ops.reduce_mean(math_ops.abs(pixel_dif1), axis=sum_axis) +
                        math_ops.reduce_mean(math_ops.abs(pixel_dif2), axis=sum_axis))
 
@@ -228,11 +208,7 @@ class FusionNet(object):
                    print("convT4 : ", conv_trans1.get_shape())
                    print("res4 : ", res1.get_shape())
                    print("up4 : ", up1.get_shape())
-            
-        
-        
-
-            return up1
+             return up1
 
     def inference_encode(self, input_):
         encode_vec = self.encoder(input_)
@@ -244,7 +220,6 @@ class FusionNet(object):
         decode_vec = self.decoder(bridge)
         output = layers.bottleneck_layer(decode_vec, self.output_dim, name="output")
         output_0_1 =  self.Normalize_0_1(output)
-        #output_0_1 = tf.div(tf.subtract(output, tf.reduce_min(output)), tf.subtract(tf.reduce_max(output), tf.reduce_min(output)))
         output_255 = tf.scalar_mul(255, output_0_1)
         
 
