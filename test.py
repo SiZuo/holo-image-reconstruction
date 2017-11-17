@@ -9,17 +9,10 @@ import time
 from Unet import Unet
 import random
 import re
-from PIL import Image
-#from ops import acts
-#from ops import layers_bn_after
 import os
 
 def test_with_cpu(flag):
     with tf.Graph().as_default():
-        #holo = glob('/home/zmxu/dataset/obj/test_holo/*.bmp')
-        #intensity = glob('/home/zmxu/dataset/obj/test_intensity/*.bmp')
-        #phase = glob('/home/zmxu/dataset/obj/test_phase/*.bmp')
-        
         path_holo = '/home/zmxu/dataset/obj/test/test_holo_5'
         path_intensity = '/home/zmxu/dataset/obj/test/test_intensity_5'
         path_phase = '/home/zmxu/dataset/obj/test/test_phase_5'
@@ -66,8 +59,6 @@ def test_with_cpu(flag):
          
              optimizer = tf.train.AdamOptimizer(lr)
              
-             #sharpen_image = tf.image.adjust_contrast(output_0_1, 1.5)
-             #loss = tf.losses.mean_squared_error(target_0_1, sharpen_image)
              loss = tf.losses.mean_squared_error(target_0_1, output_0_1) 
         
         var_list = tf.trainable_variables()
@@ -94,9 +85,6 @@ def test_with_cpu(flag):
            
             #add noise
             noise = np.zeros((flag.image_height, flag.image_width, 1), np.int8)
-            #for rates in flag.initial_learning_rates:
-            #for coef in flag.coef_total:
-            
             holo_name_list = os.listdir(path_holo)
             for coef in flag.coef:
               if utils.load_ckpt(flag.ckpt_dir, sess, flag.ckpt_name):
@@ -106,11 +94,7 @@ def test_with_cpu(flag):
               print ("------------------------------------")
               
               holo_name_list_10 = holo_name_list[:5]
-              for name in holo_name_list_10:
-               #  in_ind.append(data_test_namelist.index("test_holo" + str(num) + ".bmp")) 
-                # out_intensity_ind.append(data_test_namelist.index("test_ori" + str(num) + ".bmp"))
-                 #out_phase_ind.append(data_test_namelist.index("test_ori" + str(num) + "_phase.bmp"))
-              
+              for name in holo_name_list_10: 
                  print ("Image name is: %s"%name)
                 
                  for noise_level in flag.noise_total:
