@@ -1,8 +1,6 @@
-#from train_4 import *
-#from test_4 import *
-#from train import *
-from train_newImage import *
-#from test_newImage import *
+
+from train import *
+#from test import *
 import tensorflow as tf
 import os
 
@@ -54,7 +52,7 @@ tf.app.flags.DEFINE_boolean('model_log', False,
                             """Enable/disable log of model""")
 tf.app.flags.DEFINE_string('ckpt_name', 'mias2_1',
                            """'dataset_name'+'_'+'batch_size'""")
-tf.app.flags.DEFINE_string('ckpt_dir', './checkpoint_without_noise_FusionNet_batch1_BNatBegin_new_newImage',
+tf.app.flags.DEFINE_string('ckpt_dir', './checkpoint',
                            """./checkpoint""")
 tf.app.flags.DEFINE_integer('loss_function_change_epoch', 0,
                              """change the loss function with regu to without regu""")
