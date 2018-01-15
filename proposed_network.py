@@ -12,7 +12,7 @@ from ops import acts
 from tensorflow.python.ops import math_ops
 
 
-class FusionNet(object):
+class proposed_network(object):
     def __init__(self):
         self.act_fn = acts.pRelu
         self.kernel_num = 16
