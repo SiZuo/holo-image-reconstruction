@@ -1,5 +1,5 @@
 import tensorflow as tf
-from FusionNet import FusionNet
+from proposed_network import proposed_network
 import numpy as np
 from ops import losses
 from ops import utils
@@ -14,12 +14,12 @@ import os
 from tensorflow.contrib.tensorboard.plugins import projector
 
 
-def train_with_cpu(flag):
+def train_with_gpu(flag):
     with tf.Graph().as_default():
 #read data
-        holo = glob('/home/zmxu/dataset/obj/holo/*.bmp')
-        intensity = glob('/home/zmxu/dataset/obj/gt_intensity/*.bmp')
-        phase = glob('/home/zmxu/dataset/obj/gt_phase/*.bmp')
+        holo = glob('/path/to/data/*.bmp')
+        intensity = glob('/path/to/data/*.bmp')
+        phase = glob('/path/to/data/*.bmp')
 
         num_samples_per_epoch = len(holo)
         print ("num_samples_per_epoch: %d "%num_samples_per_epoch)
@@ -48,8 +48,8 @@ def train_with_cpu(flag):
                                            [flag.batch_size, flag.image_height, flag.image_width, flag.channel_dim])
         
         
-        model = FusionNet()
-                                                                       #resize the image 
+        model = proposed_network()
+#resize the image 
         input_ = tf.image.resize_images(input_placeholder[:, :, :, :], [flag.image_height//2, flag.image_width//2])
         target_intensity =  tf.image.resize_images(output_intensity_placeholder[:, :, :, :],[flag.image_height//2, flag.image_width//2])
         target_phase =  tf.image.resize_images(output_phase_placeholder[:, :, :, :],[flag.image_height//2, flag.image_width//2])
@@ -68,14 +68,10 @@ def train_with_cpu(flag):
             
 
             output_intensity, output_phase = tf.split(output_0_1, [1,1], 3) 
-          
-          #loss = tf.losses.mean_squared_error(target_0_1, output_0_1) 
-          loss_phase =  tf.losses.mean_squared_error(target_phase_0_1, output_phase)
+            
 #with regulization: 
           loss = tf.losses.mean_squared_error(target_0_1, output_0_1) + flag.coef * tf.reduce_mean(model.total_variation(output_0_1))
-          
-         
-         
+              
           tf.summary.scalar('loss', loss)
           tf.summary.scalar('loss_phase', loss_phase)
         
@@ -109,22 +105,16 @@ def train_with_cpu(flag):
          
            if (train == 1):
                model = FusionNet()
-               print ('Training model: FusionNet with noise level %d with BN at the begining'%flag.noise_total)
+               print ('Training model: proposed_network with noise level %d'%flag.noise_total)
           
            for noise_level in flag.noise_total:
             #for learning_rate in flag.initial_learning_rates:
             sess.run(init)
-            '''
-            
-            #if learning_rate == 0.003:
-             #   summary_writer = tf.summary.FileWriter('./train_noise_5_gradient_logs_2_003', graph_def=sess.graph_def)
-             #   ckpt_dir = "./checkpoint_with_noise_5_gradient_2_003"
-
-            '''
+          
 #save log file in certain path
             if  train == 1:
-                log_1 = './train_noise_0_log_FusionNet_batch1_BNatBegin_newImage'
-                if (tf.gfile.Exists(log_1)== False):
+                log = './train_proposed_network_log'
+                if (tf.gfile.Exists(log)== False):
                     print ('The specified base directory does not exist, now is making directory!')
                     os.mkdir(log_1)
                     print ('The specified directory is created successfully!')
@@ -165,7 +155,7 @@ def train_with_cpu(flag):
                     else:
                         new_range = [i for i in new_range if i not in sample]
                         
-                    index_input, index_output_intensity, index_output_phase, sample = model.GetIndexList("/home/zmxu/dataset/obj/holo", "/home/zmxu/dataset/obj/gt_intensity" ,"/home/zmxu/dataset/obj/gt_phase",  len(flag.data_in_name), flag.batch_size, batch_idx, new_range)
+                    index_input, index_output_intensity, index_output_phase, sample = model.GetIndexList("/path/to/input/data", "/path/to/groundtruth/intensity" ,"/path/to/groundtruth/phase",  len(flag.data_in_name), flag.batch_size, batch_idx, new_range)
 #read image and add noise
                     noise = np.zeros((flag.image_height, flag.image_width, 1), np.int8)
                     noises = cv2.randn(noise, np.zeros(1), np.ones(1)*noise_level)
@@ -199,15 +189,7 @@ def train_with_cpu(flag):
                     sess.run(train_op, feed_dict=feed)
                     
 #stop using regulization when current epoch >=loss_function_change_epoch to prevent overlearning
-                    '''
-                    if(epoch >= loss_function_change_epoch ):
-                        flag.coef = 0
-                        print("(%ds) Epoch: %d[%d/%d], loss: %f" % (time.time() - start, epoch, batch_idx, 
-                                                               num_batches_per_epoch-1, sess.run(loss, feed)))
-                    else:
-                        print("(%ds) Epoch: %d[%d/%d], loss: %f" % (time.time() - start, epoch, batch_idx,
-                                                               num_batches_per_epoch-1, sess.run(loss, feed)))
-                   '''
+                  
                     print("(%ds) Epoch: %d[%d/%d], loss: %f" % (time.time() - start, epoch, batch_idx,
                                                                num_batches_per_epoch-1, sess.run(loss, feed)))
                        
@@ -224,18 +206,18 @@ def train_with_cpu(flag):
                        
                                
                         if train == 1:
-                            dir_1 = './train_noise_0_result_batch1_BNatBegin_newImage'
-                            if (tf.gfile.Exists(dir_1)== False):
+                            dir = './train_image'
+                            if (tf.gfile.Exists(dir)== False):
                                 print ('The specified base directory does not exist, now is making directory!')
-                                os.mkdir(dir_1)
+                                os.mkdir(dir)
                                 print ('The specified directory is created successfully!')
                             for idx in range(len(sample)): 
-                               cv2.imwrite(dir_1+'/coef%d_gen_intensity_with_noise_%d_%s.bmp'%(flag.coef, noise_level, sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
-                               cv2.imwrite(dir_1+'/coef%d_gen_phase_with_noise_%d_%s.bmp'%(flag.coef, noise_level, sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
+                               cv2.imwrite(dir +'/coef%d_gen_intensity_with_noise_%d_%s.bmp'%(flag.coef, noise_level, sample[idx]), 255*output_intensity[j].eval(feed_dict=feed))
+                               cv2.imwrite(dir +'/coef%d_gen_phase_with_noise_%d_%s.bmp'%(flag.coef, noise_level, sample[idx]), 10*output_phase[j].eval(feed_dict=feed))
                                j += 1
                      
                 epoch += 1
             
                 
-def train_with_gpu(flag):
+def train_with_cpu(flag):
     pass
