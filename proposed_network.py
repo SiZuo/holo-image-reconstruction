@@ -36,13 +36,7 @@ class FusionNet(object):
         index_out_phase = []
         
         idx = idx_new
-        #print (idx)
         sample = np.random.choice(idx, batch_size, replace=False)
-        #ind = 0
-        #for j in sample:
-         #   sample[ind] = '{0:03}'.format(j)
-         #   ind += 1
-        
         for i in sample:
             obj_name = input_[i] #2017-07-14_14_07_24_084.bmp
             
@@ -53,9 +47,6 @@ class FusionNet(object):
         sample = list(map(int,sample))
 
         return index_in, index_out_intensity, index_out_phase, sample
-        
-    #def Val_GetIndexList_newImage:
-    #def GetIndexList_newImage:
         
     def GetFileList(path):  
         FindPath = path
@@ -74,17 +65,6 @@ class FusionNet(object):
                       filename= fn 
                       FileList.append(filename)   
         return FileList
-    
- 
-    def centeredCrop( img, width, height, new_height, new_width):
-        
-        left = np.ceil((width - new_width)/2.)
-        top = np.ceil((height - new_height)/2.)
-        right = np.floor((width + new_width)/2.)
-        bottom = np.floor((height + new_height)/2.)
-        cImg = img[:,int(top):int(bottom), int(left):int(right),:]
-        return cImg
-        
         
     def total_variation(self, images, name=None):
          with tf.name_scope('total_variation'):
@@ -133,18 +113,17 @@ class FusionNet(object):
             return conv2
 
     def encoder(self, input_):
-        if (1 == 1):
-            self.down1 = self.conv_res_conv_block(input_, self.kernel_num, name="down1")
-            pool1 = layers.max_pool(self.down1, name= "pool1")
+        self.down1 = self.conv_res_conv_block(input_, self.kernel_num, name="down1")
+        pool1 = layers.max_pool(self.down1, name= "pool1")
 
-            self.down2 = self.conv_res_conv_block(pool1, self.kernel_num * 2, name="down2")
-            pool2 = layers.max_pool(self.down2, name="pool2")
+        self.down2 = self.conv_res_conv_block(pool1, self.kernel_num * 2, name="down2")
+        pool2 = layers.max_pool(self.down2, name="pool2")
+        
+        self.down3 = self.conv_res_conv_block(pool2, self.kernel_num * 4, name="down3")
+        pool3 = layers.max_pool(self.down3, name="pool3")
 
-            self.down3 = self.conv_res_conv_block(pool2, self.kernel_num * 4, name="down3")
-            pool3 = layers.max_pool(self.down3, name="pool3")
-
-            self.down4 = self.conv_res_conv_block(pool3, self.kernel_num * 8, name="down4")
-            pool4 = layers.max_pool(self.down4, name="pool4")
+        self.down4 = self.conv_res_conv_block(pool3, self.kernel_num * 8, name="down4")
+        pool4 = layers.max_pool(self.down4, name="pool4")
 
         #self.down5 = self.conv_res_conv_block(pool4, self.kernel_num * 16, name="down5")
         #pool5 = layers.max_pool(self.down5, name="pool5")
