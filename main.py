@@ -1,6 +1,6 @@
 
 from train import *
-#from test import *
+from test import *
 import tensorflow as tf
 import os
 
@@ -44,7 +44,7 @@ tf.app.flags.DEFINE_integer('coef', 0,
                             """coef for regularization""")
 tf.app.flags.DEFINE_integer('num_class', 2,
                             """Nuber of classes""")
-tf.app.flags.DEFINE_integer('num_gpu', 0,
+tf.app.flags.DEFINE_integer('num_gpu', 2,
                             """Number of GPU""")
 tf.app.flags.DEFINE_string('phase', 'train',
                            """train or test""")
